@@ -17,6 +17,20 @@ export class User {
 		type: "varchar",
 		length: 96,
 		nullable: false,
+	})
+	firstName: string;
+
+	@Column({
+		type: "varchar",
+		length: 96,
+		nullable: true,
+	})
+	lastName: string;
+
+	@Column({
+		type: "varchar",
+		length: 96,
+		nullable: false,
 		unique: true,
 	})
 	username: string;

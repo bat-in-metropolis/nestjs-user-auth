@@ -1,9 +1,24 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ConfigService } from "@nestjs/config";
+import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+
+	/**
+	 * Global validation pipe
+	 * - whitelist: strips unknown properties
+	 * - forbidNonWhitelisted: throws error if extra fields are sent
+	 * - transform: auto-transform payloads to DTO types
+	 */
+	app.useGlobalPipes(
+		new ValidationPipe({
+			whitelist: true,
+			forbidNonWhitelisted: true,
+			transform: true,
+		}),
+	);
 
 	const configService = app.get(ConfigService);
 	const PORT = configService.get<number>("appConfig.port") ?? 3000;

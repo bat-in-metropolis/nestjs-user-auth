@@ -1,14 +1,64 @@
-import { Injectable } from "@nestjs/common";
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+	RequestTimeoutException,
+} from "@nestjs/common";
+import { CreateUserByAdminDto } from "../dto/create-user-by-admin.dto";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Roles } from "../enums/userRoles.enums";
+import { User } from "../user.entity";
 
 @Injectable()
 export class UsersService {
-	public createUser() {
+	constructor(
+		/**
+		 * User repository used for database operations
+		 */
+		@InjectRepository(User)
+		private readonly userRepository: Repository<User>,
+	) {}
+	public async createUser(dto: CreateUserDto): Promise<User> {
 		/**
 		 * To register an user
 		 * -> will call this when an unknown entity try to register itself
 		 * -> An already logged-in user cannot create an user.
 		 * -> POST /auth/register
 		 */
+		const user = this.userRepository.create({
+			...dto,
+			role: Roles.USER,
+		});
+
+		//   user.password = await bcrypt.hash(user.password, 10);
+
+		try {
+			return await this.userRepository.save(user);
+		} catch (error: any) {
+			if (error.code === "23505") {
+				throw new BadRequestException(
+					"User already exists with this email or username",
+				);
+			}
+
+			throw new InternalServerErrorException("Unable to process request");
+		}
+	}
+
+	public async createUserByAdmin(dto: CreateUserByAdminDto): Promise<User> {
+		const user = this.userRepository.create(dto);
+
+		try {
+			return await this.userRepository.save(user);
+		} catch (error: any) {
+			if (error.code === "23505") {
+				throw new BadRequestException("User already exists");
+			}
+
+			throw new RequestTimeoutException("Unable to process request");
+		}
 	}
 
 	public getUserById() {
