@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
+	NotFoundException,
 	RequestTimeoutException,
 } from "@nestjs/common";
 import { CreateUserByAdminDto } from "../dto/create-user-by-admin.dto";
@@ -61,13 +62,19 @@ export class UsersService {
 		}
 	}
 
-	public getUserById() {
+	public async getUserById(id: number): Promise<User | null> {
 		/**
 		 * To get details of an user
 		 * -> Admin authority.
 		 * -> GET /admin/users/:id
 		 * -> GET /users/me
 		 */
+		const user = await this.userRepository.findOneBy({ id: id });
+
+		if (!user)
+			throw new NotFoundException(`User with User Id: ${id} does not exists`);
+
+		return user;
 	}
 
 	public getAllUsers() {
@@ -131,9 +138,25 @@ export class UsersService {
 		 */
 	}
 
-	public findUserByEmail() {
+	public async findUserByEmail(email: string): Promise<User | null> {
 		/**
 		 * not linked to any route, will use internally.
 		 */
+		const user = await this.userRepository.findOneBy({
+			email: email,
+		});
+
+		return user;
+	} // internal use
+
+	public async findUserByUserName(username: string): Promise<User | null> {
+		/**
+		 * not linked to any route, will use internally.
+		 */
+		const user = await this.userRepository.findOneBy({
+			username: username,
+		});
+
+		return user;
 	} // internal use
 }

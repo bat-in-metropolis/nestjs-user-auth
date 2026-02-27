@@ -1,5 +1,15 @@
-import { Controller, Delete, Get, Patch, Post } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
+} from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
 import { UsersService } from "./providers/users.service";
+import { GetUserByIdDto } from "./dto/get-user-by-id.dto";
 
 @Controller("users")
 export class UsersController {
@@ -11,9 +21,9 @@ export class UsersController {
 	) {}
 
 	@Post("create")
-	public createUser() {
+	public createUser(@Body() dto: CreateUserDto) {
 		// This is a temp, after will create "/auth/register" will delete this route.
-		return this.usersService.createUser();
+		return this.usersService.createUser(dto);
 	}
 
 	@Patch()
@@ -27,9 +37,9 @@ export class UsersController {
 	}
 
 	@Get("/:id")
-	public getUser() {
+	public getUser(@Param() dto: GetUserByIdDto) {
 		// Currently doing by id, later on will fetch by token.
-		return this.usersService.getUserById();
+		return this.usersService.getUserById(dto.id);
 	}
 
 	@Patch("me/password")
