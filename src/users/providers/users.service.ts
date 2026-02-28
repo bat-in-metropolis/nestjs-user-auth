@@ -5,12 +5,14 @@ import {
 	NotFoundException,
 	RequestTimeoutException,
 } from "@nestjs/common";
-import { CreateUserByAdminDto } from "../dto/create-user-by-admin.dto";
-import { CreateUserDto } from "../dto/create-user.dto";
+import type { CreateUserByAdminDto } from "../dto/create-user-by-admin.dto";
+import type { CreateUserDto } from "../dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { plainToInstance } from "class-transformer";
+import type { Repository } from "typeorm";
 import { Roles } from "../enums/userRoles.enums";
 import { User } from "../user.entity";
+import { UserResponseDto } from "../dto/user-response.dto";
 
 @Injectable()
 export class UsersService {
@@ -21,7 +23,7 @@ export class UsersService {
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
 	) {}
-	public async createUser(dto: CreateUserDto): Promise<User> {
+	public async createUser(dto: CreateUserDto): Promise<UserResponseDto> {
 		/**
 		 * To register an user
 		 * -> will call this when an unknown entity try to register itself
@@ -36,7 +38,10 @@ export class UsersService {
 		//   user.password = await bcrypt.hash(user.password, 10);
 
 		try {
-			return await this.userRepository.save(user);
+			await this.userRepository.save(user);
+			return plainToInstance(UserResponseDto, user, {
+				excludeExtraneousValues: true,
+			});
 		} catch (error: any) {
 			if (error.code === "23505") {
 				throw new BadRequestException(
@@ -62,7 +67,7 @@ export class UsersService {
 		}
 	}
 
-	public async getUserById(id: number): Promise<User | null> {
+	public async getUserById(id: number): Promise<UserResponseDto> {
 		/**
 		 * To get details of an user
 		 * -> Admin authority.
@@ -74,7 +79,9 @@ export class UsersService {
 		if (!user)
 			throw new NotFoundException(`User with User Id: ${id} does not exists`);
 
-		return user;
+		return plainToInstance(UserResponseDto, user, {
+			excludeExtraneousValues: true,
+		});
 	}
 
 	public getAllUsers() {

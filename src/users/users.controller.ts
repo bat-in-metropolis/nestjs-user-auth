@@ -36,7 +36,7 @@ export class UsersController {
 		return this.usersService.softDeleteUser();
 	}
 
-	@Get("/:id")
+	@Get(":id")
 	public getUser(@Param() dto: GetUserByIdDto) {
 		// Currently doing by id, later on will fetch by token.
 		return this.usersService.getUserById(dto.id);
