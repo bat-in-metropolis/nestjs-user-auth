@@ -4,6 +4,7 @@ import { AppService } from "./app.service";
 import { UsersModule } from "./users/users.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { AuthModule } from './auth/auth.module';
 import databaseConfig from "./config/database.config";
 import environmentValidation from "./config/environment.validation";
 import appConfig from "./config/app.config";
@@ -32,6 +33,7 @@ const ENV = process.env.NODE_ENV;
 			}),
 		}),
 		UsersModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

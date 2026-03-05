@@ -1,0 +1,12 @@
+## Register New User
+
+POST http://localhost:8081/auth/register
+Content-Type: application/json
+
+{
+    "firstName": "John6",
+    "lastName": "Doe",
+    "username": "john_doe6",
+    "email": "john.doe6@example.com",
+    "password": "Password123!"
+}
