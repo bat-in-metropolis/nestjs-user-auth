@@ -1,0 +1,10 @@
+## Login User
+
+POST http://localhost:8081/auth/login
+Content-Type: application/json
+
+{
+    // "username": "john_doe",
+    "email": "john.doe@example.com",
+    "password": "Password123!"
+}

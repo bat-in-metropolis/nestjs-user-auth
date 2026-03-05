@@ -145,7 +145,7 @@ export class UsersService {
 		 */
 	}
 
-	public async findUserByEmail(email: string): Promise<User | null> {
+	private async findUserByEmail(email: string): Promise<User | null> {
 		/**
 		 * not linked to any route, will use internally.
 		 */
@@ -156,7 +156,7 @@ export class UsersService {
 		return user;
 	} // internal use
 
-	public async findUserByUserName(username: string): Promise<User | null> {
+	private async findUserByUserName(username: string): Promise<User | null> {
 		/**
 		 * not linked to any route, will use internally.
 		 */
@@ -166,4 +166,35 @@ export class UsersService {
 
 		return user;
 	} // internal use
+
+	public async findUser(identifier: {
+		username?: string;
+		email?: string;
+	}): Promise<User | null> {
+		const { username, email } = identifier;
+
+		/**
+		 * if (username) {
+		 * 	return this.findUserByUserName(username);
+		 * } else if (email) {
+		 * 	return this.findUserByEmail(email);
+		 * }
+		 */
+
+		const strategies: [
+			string | undefined,
+			(val: string) => Promise<User | null>,
+		][] = [
+			[username, this.findUserByUserName.bind(this)],
+			[email, this.findUserByEmail.bind(this)],
+		];
+
+		for (const [value, finder] of strategies) {
+			if (value) {
+				return finder(value);
+			}
+		}
+
+		return null;
+	}
 }
