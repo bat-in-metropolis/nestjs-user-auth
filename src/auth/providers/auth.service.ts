@@ -5,6 +5,7 @@ import {
 	InternalServerErrorException,
 	UnauthorizedException,
 } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "../dto/login-user.dto";
 import { plainToInstance } from "class-transformer";
 import { User } from "src/users/user.entity";
@@ -18,13 +19,20 @@ export class AuthService {
 		 * Injecting usersService instance
 		 */
 		private readonly usersService: UsersService,
+
+		/**
+		 * Injecting jwtService instance
+		 */
+		private readonly jwtService: JwtService,
 	) {}
 
 	public async register(dto: CreateUserDto) {
 		return this.usersService.createUser(dto);
 	}
 
-	public async login(dto: LoginUserDto): Promise<UserResponseDto> {
+	public async login(
+		dto: LoginUserDto,
+	): Promise<{ access_token: string; user: UserResponseDto }> {
 		let user: User | null;
 
 		try {
@@ -52,13 +60,16 @@ export class AuthService {
 			throw new UnauthorizedException("Invalid credentials");
 		}
 
-		// const payload: JwtPayload = {
-		//     sub: user.id,
-		//     email: user.email,
-		// };
+		const payload = {
+			sub: user.id,
+			email: user.email,
+		};
 
-		return plainToInstance(UserResponseDto, user, {
-			excludeExtraneousValues: true,
-		});
+		return {
+			access_token: this.jwtService.sign(payload),
+			user: plainToInstance(UserResponseDto, user, {
+				excludeExtraneousValues: true,
+			}),
+		};
 	}
 }
