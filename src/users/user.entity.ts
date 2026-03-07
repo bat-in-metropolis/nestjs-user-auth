@@ -46,6 +46,7 @@ export class User {
 	@Column({
 		type: "text",
 		nullable: false,
+		select: false, // Exclude password from query results by default
 	})
 	password: string;
 

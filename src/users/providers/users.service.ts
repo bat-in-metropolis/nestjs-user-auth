@@ -155,8 +155,9 @@ export class UsersService {
 		/**
 		 * not linked to any route, will use internally.
 		 */
-		const user = await this.userRepository.findOneBy({
-			email: email,
+		const user = await this.userRepository.findOne({
+			where: { email },
+			select: { password: true, id: true, email: true },
 		});
 
 		return user;
@@ -166,8 +167,9 @@ export class UsersService {
 		/**
 		 * not linked to any route, will use internally.
 		 */
-		const user = await this.userRepository.findOneBy({
-			username: username,
+		const user = await this.userRepository.findOne({
+			where: { username },
+			select: { password: true, id: true, username: true },
 		});
 
 		return user;
