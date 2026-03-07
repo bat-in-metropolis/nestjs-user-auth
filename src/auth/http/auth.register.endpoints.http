@@ -4,9 +4,9 @@ POST http://localhost:8081/auth/register
 Content-Type: application/json
 
 {
-    "firstName": "John6",
+    "firstName": "John7",
     "lastName": "Doe",
-    "username": "john_doe6",
-    "email": "john.doe6@example.com",
+    "username": "john_doe7",
+    "email": "john.doe7@example.com",
     "password": "Password123!"
 }

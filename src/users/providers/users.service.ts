@@ -5,6 +5,7 @@ import {
 	NotFoundException,
 	RequestTimeoutException,
 } from "@nestjs/common";
+import bcrypt from "bcryptjs";
 import type { CreateUserByAdminDto } from "../dto/create-user-by-admin.dto";
 import type { CreateUserDto } from "../dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -30,15 +31,20 @@ export class UsersService {
 		 * -> An already logged-in user cannot create an user.
 		 * -> POST /auth/register
 		 */
-		const user = this.userRepository.create({
-			...dto,
-			role: Roles.USER,
-		});
-
-		//   user.password = await bcrypt.hash(user.password, 10);
+		const { password, ...userDtoWithoutPassword } = dto;
 
 		try {
+			// ✅ Async, non-blocking | salt is handled internally
+			const hashedPassword = await bcrypt.hash(password, 10);
+
+			const user = this.userRepository.create({
+				...userDtoWithoutPassword,
+				password: hashedPassword,
+				role: Roles.USER,
+			});
+
 			await this.userRepository.save(user);
+
 			return plainToInstance(UserResponseDto, user, {
 				excludeExtraneousValues: true,
 			});
